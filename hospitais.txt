@@ -1,0 +1,7 @@
+Hospital S. Joao
+Lisboa
+Ortopedia: 10/07/2021 (Pedro Marques 05/09/1989)
+Raio-X: 21/05/2022 (Luisa Sousa 01/02/1984)
+Nutricionista: 09/12/2021 (Fernando Borges 25/09/1999)
+Pediatria: 30/08/2021 (Hugo Silva 03/05/2015)
+Cardiologia: 04/04/2022 (Teresa Domingues 24/11/1947)
