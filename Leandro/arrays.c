@@ -3,9 +3,12 @@
 
 #define DIM 7
 
+int verifica(float temperatura);
+
+float mediaTemperaturas(float array[DIM]);
+
 int main()
 {
-    float media = 0;
     float arrayTemperaturas[DIM];
 
     for (int i = 0; i < DIM; i++)
@@ -14,21 +17,39 @@ int main()
         {
             printf("Temperatura no dia %d: ", i + 1);
             scanf(" %f", &arrayTemperaturas[i]);
-        } while (arrayTemperaturas[i] > 50 || arrayTemperaturas[i] < -50);
-
-        media += arrayTemperaturas[i];
+        } while (!verifica(arrayTemperaturas[i]));
     }
-
-    media /= DIM;
 
     for (int i = 0; i < DIM; i++)
     {
         printf("%.1f ", arrayTemperaturas[i]);
     }
 
+    mostraMenu();
 
-    printf("\n%.2f\n", media);
-    
+    printf("\n%.2f\n", mediaTemperaturas(arrayTemperaturas));
+}
+
+int verifica(float temperatura)
+{
+    if (temperatura > 50 || temperatura < -50)
+    {
+        return 0;
+    }
+
+    return 1;    
+}
+
+float mediaTemperaturas(float array[DIM])
+{
+    float soma = 0;
+
+    for (int i = 0; i < DIM; i++)
+    {
+        soma += array[i];
+    }
+
+    return soma / DIM;
 }
 
 /*

@@ -1,46 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define DIM 7
 
 int soma(int a, int b);
 
+int maior(int array[DIM]);
+
 int main()
 {
-    float media = 0;
-    float arrayTemperaturas[DIM];
+    int i1, i2;
+    int array[DIM] = {1, 5, 34, 2, 87, 9, 12};
+    int resultado;
 
-    for (int i = 0; i < DIM; i++)
-    {
-        do
-        {
-            printf("Temperatura no dia %d: ", i + 1);
-            scanf(" %f", &arrayTemperaturas[i]);
-        } while (arrayTemperaturas[i] > 50 || arrayTemperaturas[i] < -50);
+    i1 = 1;
+    i2 = 2;
 
-        media += arrayTemperaturas[i];
-    }
+    resultado = soma(i1, i2);
 
-    media /= DIM;
-
-    for (int i = 0; i < DIM; i++)
-    {
-        printf("%.1f ", arrayTemperaturas[i]);
-    }
-
-
-    printf("\n%.2f\n", media);
-    
+    printf("Maior elemento: %d", maior);
 }
 
 int soma(int a, int b) {
     return a + b;
 }
 
-/*
- * Criar programa de meteorologia
- * Pedir ao utilizador a temperatura dos 7 dias de uma semana
- * Não aceitar temperaturas menores que -50 nem maiores que 50
- * No final imprimir as temperaturas e a média das temperaturas
- * NOTA: As temperaturas serão números decimais
-*/
+int maior(int array[DIM])
+{
+    int maior = 0;
+
+    for (int i = 0; i < DIM; i++)
+    {
+        if (array[i] > maior)
+        {
+            maior = array[i];
+        }
+    }
+    
+    return maior;
+}
