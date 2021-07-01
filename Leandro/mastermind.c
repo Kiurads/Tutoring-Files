@@ -63,7 +63,6 @@ int main()
 void mastermind(int chooseSequence)
 {
     int checkSequence;
-    int correctColours = 0;
     char sequence[4];
     char board[11][4];
 
@@ -88,6 +87,8 @@ void mastermind(int chooseSequence)
 
     for (int i = 0; i < 11; i++)
     {
+        int correctColours = 0;
+        
         printBoard(board);
 
         for (int j = 0; j < 4; j++)
@@ -113,9 +114,9 @@ void mastermind(int chooseSequence)
 
         if(isAnswerCorrect(sequence, board[i], &correctColours))
         {
-            printSequence(sequence);
-
     	    printBoard(board);
+
+            printSequence(sequence);
 
             printf("CONGRATULATIONS! YOU WON!\n\n");
 
@@ -129,9 +130,11 @@ void mastermind(int chooseSequence)
 
     printf("GAME OVER\n\n");
 
-    printSequence(sequence);
-
     printBoard(board);
+
+    printf("The correct sequence was: ");
+
+    printSequence(sequence);
 }
 
 void fillBoard(char board[11][4])
@@ -216,8 +219,6 @@ void printSequence(char sequence[4])
 
 int isAnswerCorrect(char sequence[4], char answer[4], int *correctColours)
 {
-    *correctColours = 0;
-
     for (int i = 0; i < 4; i++)
     {
         if (sequence[i] == answer[i])
