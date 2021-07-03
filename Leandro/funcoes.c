@@ -19,7 +19,7 @@ int main()
 
     resultado = soma(i1, i2);
 
-    printf("Maior elemento: %d", maior);
+    printf("Maior elemento: %d", maior(array));
 }
 
 int soma(int a, int b) {
