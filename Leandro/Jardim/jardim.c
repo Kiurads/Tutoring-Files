@@ -72,7 +72,7 @@ jardim removePlanta(jardim jardimAtual)
         printf("Plantacao encontra-se vazia\n");
         return jardimAtual;
     }
-    
+
     printf("Posicao a remover a planta (de 1 a %d): ", jardimAtual.nPlantas);
     scanf(" %d", &posicao);
 
@@ -84,13 +84,20 @@ jardim removePlanta(jardim jardimAtual)
         return jardimAtual;
     }
 
-    for (int i = posicao; i < jardimAtual.; i++)
+    for (int i = posicao; i < jardimAtual.nPlantas - 1; i++)
     {
-        /* code */
+        jardimAtual.plantas[i] = jardimAtual.plantas[i - 1];
     }
-    
 
-    strcpy(jardimAtual.plantas[posicao].especie, "");
+    jardimAtual.plantas = realloc(jardimAtual.plantas, sizeof(planta) * (jardimAtual.nPlantas - 1));
+
+    if (jardimAtual.plantas == NULL)
+    {
+        printf("ERRO: realloc() deu erro\n\n");
+        return jardimAtual;
+    }
+
+    jardimAtual.nPlantas--;
 
     return jardimAtual;
 }
@@ -159,7 +166,13 @@ int main()
             break;
         }
 
+        if (jardimAtual.plantas == NULL)
+        {
+            return 1;
+        }
     } while (opcao != 0);
+
+    free(jardimAtual.plantas);
 }
 
 /*
@@ -171,4 +184,6 @@ int main()
  * Remover planta do array (apagar nome)
  * 
  * Parte 2:
+ * Alterar a estrutura jardim para passar a ter um array dinamico
+ * Alterar a funcao de adicionar uma planta para, em vez de adicionar a um array de tamanho fixo, cria uma nova posicao no array para cada planta
 */

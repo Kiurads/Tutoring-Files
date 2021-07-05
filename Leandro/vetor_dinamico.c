@@ -4,64 +4,71 @@
 typedef struct concorrente
 {
     char nome[100];
-    int numero;
+    int posicao;
 } Concorrente, *pConcorrente;
 
 int main(int argc, char **argv)
 {
-    int nConcorrentes;
+    int opcao;
+    int tamanho = 0;
     pConcorrente arrayConcorrentes;
 
-    printf("Quantos concorrentes participam: ");
-    scanf(" %d", &nConcorrentes);
-
-    for (int i = 0; i < nConcorrentes; i++)
+    do
     {
-        if (i == 0)
+        printf("\n1 - Registar concorrente\n");
+        printf("0 - Terminar corrida\n\n");
+
+        printf("Opcao: ");
+        scanf(" %d", &opcao);
+
+        switch (opcao)
         {
-            arrayConcorrentes = malloc(sizeof(Concorrente));
-
-            if (arrayConcorrentes == NULL)
+        case 1:            
+            if (tamanho == 0)
             {
-                printf("ERRO: malloc() deu erro\n\n");
-                return 1;
-            }
-        }
-        else
-        {
-            arrayConcorrentes = realloc(arrayConcorrentes, sizeof(Concorrente) * (i + 1));
+                tamanho++;
+                
+                arrayConcorrentes = malloc(sizeof(Concorrente));
 
-            if (arrayConcorrentes == NULL)
+                if (arrayConcorrentes == NULL)
+                {
+                    printf("ERRO: malloc()\n");
+                    return 1;
+                }
+            }
+            else
             {
-                printf("ERRO: realloc() deu erro\n\n");
-                return 1;
+                tamanho++;
+                
+                arrayConcorrentes = realloc(arrayConcorrentes, sizeof(Concorrente) * tamanho);
+
+                if (arrayConcorrentes == NULL)
+                {
+                    printf("ERRO: realloc()\n");
+                    return 1;
+                }
             }
+
+            printf("Nome do concorrente: ");
+            scanf(" %[^\n]", arrayConcorrentes[tamanho - 1].nome);
+
+            arrayConcorrentes[tamanho - 1].posicao = tamanho;
+            
+            break;
+
+        case 0:
+            printf("Corrida terminada!\n");
+            break;
+
+        default:
+            printf("Opcao invalida\n");
+            break;
         }
+    } while (opcao != 0);
 
-        printf("Nome do concorrente %d: ", i + 1);
-        scanf(" %[^\n]", &arrayConcorrentes[i]);
-
-        arrayConcorrentes[i].numero = i * (2 + i);
-    }
-
-    for (int i = 0; i < nConcorrentes; i++)
+    for (int i = 0; i < tamanho; i++)
     {
-        printf("Concorrente %s ficou com o numero %d\n", arrayConcorrentes[i].nome, arrayConcorrentes[i].numero);
-    }
-
-    printf("\n");
-
-    arrayConcorrentes = realloc(arrayConcorrentes, sizeof(Concorrente) * (--nConcorrentes));
-
-    if (arrayConcorrentes == NULL)
-    {
-        printf("ERRO: realloc() deu erro\n\n");
-        return 1;
-    }
-
-    for (int i = 0; i < nConcorrentes; i++)
-    {
-        printf("Concorrente %s ficou com o numero %d\n", arrayConcorrentes[i].nome, arrayConcorrentes[i].numero);
+        printf("%d. %s\n", arrayConcorrentes[i].posicao, arrayConcorrentes[i].nome);
     }
 
     free(arrayConcorrentes);

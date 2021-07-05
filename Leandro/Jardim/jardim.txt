@@ -1,0 +1,14 @@
+Jardim Belo Campo: 17/06/1335
+Plantas: 6
+Planta 1
+Abobora[1, 23.2]
+Planta 2
+Jasmim-Azul[3, 14.7]
+Planta 3
+Limoeiro[6, 19.3]
+Planta 4
+Cipreste Comum[9, 16.8]
+Planta 5
+Pinheiro Bravo[12, 17.5]
+Planta 6
+Sobreiro[8, 12.4]

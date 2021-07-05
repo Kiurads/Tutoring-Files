@@ -70,7 +70,7 @@ int contaGaiolas(pCriador listaCriadores, int gaiola)
     return contagem;
 }
 
-pCriador RestiraVendidas(pCriador lista)
+pCriador RetiraVendidas(pCriador lista)
 {
     pCriador atualCriador, anteriorCriador;
 

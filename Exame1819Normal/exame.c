@@ -287,14 +287,6 @@ pdiv exercicio3B(pdiv d, int* totD, int id, struct pessoa* hab, int totP)
 		d[i].n_pessoas = d[i + 1].n_pessoas;
 		strcpy(d[i].nome, d[i + 1].nome);
 		d[i].lista = d[i + 1].lista;
-
-		for (int j = 0; j < totP; j++)
-		{
-			if (hab[j].local->id == d[i + 1].id)
-			{
-				hab[j].local = &d[i];
-			}
-		}
 	}
 
 	(*totD) -= 1;
@@ -321,17 +313,15 @@ pdiv exercicio3B(pdiv d, int* totD, int id, struct pessoa* hab, int totP)
 				if (anterior == NULL)
 				{
 					d[i].lista = atual->prox;
-					free(atual);
-
-					break;
 				}
 				else
 				{
 					anterior->prox = atual->prox;
-					free(atual);
-
-					break;
 				}
+			
+				free(atual);
+
+				break;
 			}
 
 			anterior = atual;
