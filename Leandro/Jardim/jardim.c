@@ -26,6 +26,20 @@ typedef struct Jardim
     pplanta plantas;
 } jardim;
 
+void mostraJardim(jardim jardimAtual)
+{
+    printf("Jardim %s fundado a %d/%d/%d\n\n", jardimAtual.nome, jardimAtual.fundacao.dia, jardimAtual.fundacao.mes, jardimAtual.fundacao.ano);
+
+    for (int i = 0; i < jardimAtual.nPlantas; i++)
+    {
+        printf("Planta %d\n", i + 1);
+        printf("%s com %d anos de idade tem uma temperatura ideal de %.1f graus\n\n",
+               jardimAtual.plantas[i].especie,
+               jardimAtual.plantas[i].idade,
+               jardimAtual.plantas[i].temperaturaIdeal);
+    }
+}
+
 jardim adicionaPlanta(jardim jardimAtual)
 {
     if (jardimAtual.nPlantas == 0)
@@ -86,7 +100,7 @@ jardim removePlanta(jardim jardimAtual)
 
     for (int i = posicao; i < jardimAtual.nPlantas - 1; i++)
     {
-        jardimAtual.plantas[i] = jardimAtual.plantas[i - 1];
+        jardimAtual.plantas[i] = jardimAtual.plantas[i + 1];
     }
 
     jardimAtual.plantas = realloc(jardimAtual.plantas, sizeof(planta) * (jardimAtual.nPlantas - 1));
@@ -102,43 +116,87 @@ jardim removePlanta(jardim jardimAtual)
     return jardimAtual;
 }
 
-jardim inicializaJardim()
+jardim inicializaJardim(char *nomeFich)
 {
+    FILE *f;
     jardim jardimAtual;
 
-    printf("Nome do jardim: ");
-    scanf(" %[^\n]", jardimAtual.nome);
+    if ((f = fopen(nomeFich, "rt")) != NULL)
+    {
+        fscanf(f, "Jardim %[^:]: %d/%d/%d\n", jardimAtual.nome, &jardimAtual.fundacao.dia, &jardimAtual.fundacao.mes, &jardimAtual.fundacao.ano);
+        fscanf(f, "Plantas: %d\n", &jardimAtual.nPlantas);
 
-    printf("Data de fundacao (DD/MM/AAAA): ");
-    scanf(" %d/%d/%d", &jardimAtual.fundacao.dia, &jardimAtual.fundacao.mes, &jardimAtual.fundacao.ano);
+        jardimAtual.plantas = malloc(sizeof(planta) * jardimAtual.nPlantas);
 
-    jardimAtual.nPlantas = 0;
+        if (jardimAtual.plantas == NULL)
+        {
+            printf("ERRO: malloc()\n");
+            return jardimAtual;
+        }
+        
+        for (int i = 0; i < jardimAtual.nPlantas; i++)
+        {
+            char buffer[20];
+
+            fgets(buffer, 20, f);
+
+            fscanf(f, "%[^[][%d, %f]\n", jardimAtual.plantas[i].especie, &jardimAtual.plantas[i].idade, &jardimAtual.plantas[i].temperaturaIdeal);
+        }
+
+        fclose(f);
+    }
+    else
+    {
+        printf("Nome do jardim: ");
+        scanf(" %[^\n]", jardimAtual.nome);
+
+        printf("Data de fundacao (DD/MM/AAAA): ");
+        scanf(" %d/%d/%d", &jardimAtual.fundacao.dia, &jardimAtual.fundacao.mes, &jardimAtual.fundacao.ano);
+
+        jardimAtual.nPlantas = 0;
+    }
 
     return jardimAtual;
 }
 
-void mostraJardim(jardim jardimAtual)
+void guardaDados(jardim jardimAtual)
 {
-    printf("Jardim %s fundado a %d/%d/%d\n\n", jardimAtual.nome, jardimAtual.fundacao.dia, jardimAtual.fundacao.mes, jardimAtual.fundacao.ano);
+    FILE* f;
+
+    f = fopen("jardim.txt", "wt");
+
+    fprintf(f, "Jardim %s: %d/%d/%d\n", jardimAtual.nome, jardimAtual.fundacao.dia, jardimAtual.fundacao.mes, jardimAtual.fundacao.ano);
+    fprintf(f, "Plantas: %d\n", jardimAtual.nPlantas);
 
     for (int i = 0; i < jardimAtual.nPlantas; i++)
     {
-        printf("Planta %d\n", i + 1);
-        printf("%s com %d anos de idade tem uma temperatura ideal de %.1f graus\n\n",
-               jardimAtual.plantas[i].especie,
-               jardimAtual.plantas[i].idade,
-               jardimAtual.plantas[i].temperaturaIdeal);
+        fprintf(f, "Planta %d\n", i + 1);
+
+        fprintf(f, "%s[%d, %.1f]\n", jardimAtual.plantas[i].especie, jardimAtual.plantas[i].idade, jardimAtual.plantas[i].temperaturaIdeal);
     }
+    
+    fclose(f);
 }
 
-int main()
+int main(int argc, char** args)
 {
     int opcao;
+    char ficheiro[100];
     jardim jardimAtual;
 
-    jardimAtual = inicializaJardim();
+    if (argc == 2)
+        strcpy(ficheiro, args[1]);
+    else
+        strcpy(ficheiro, "jardim.txt");
+        
+    jardimAtual = inicializaJardim(ficheiro);
 
-    printf("Bem-vindo/a ao jardim %s\n\n", jardimAtual.nome);
+    if (jardimAtual.plantas == NULL)
+    {
+        return 1;
+    }
+
+    printf("Bem-vindo/a ao Jardim %s\n", jardimAtual.nome);
 
     do
     {
@@ -170,7 +228,10 @@ int main()
         {
             return 1;
         }
+        
     } while (opcao != 0);
+
+    guardaDados(jardimAtual);
 
     free(jardimAtual.plantas);
 }
