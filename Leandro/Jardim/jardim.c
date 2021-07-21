@@ -4,11 +4,19 @@
 
 #define PLANTAS 20
 
-typedef struct Data data;
-
-struct Data
+typedef struct Data
 {
     int dia, mes, ano;
+} data;
+
+typedef struct Jardineiro jardineiro, *pjardineiro;
+struct Jardineiro
+{
+    char nome[100];
+    data nascimento;
+    int horaChegada;
+    int horaSaida;
+    pjardineiro prox;
 };
 
 typedef struct Planta
@@ -24,6 +32,7 @@ typedef struct Jardim
     data fundacao;
     int nPlantas;
     pplanta plantas;
+    pjardineiro lista;
 } jardim;
 
 void mostraJardim(jardim jardimAtual)
@@ -133,7 +142,7 @@ jardim inicializaJardim(char *nomeFich)
             printf("ERRO: malloc()\n");
             return jardimAtual;
         }
-        
+
         for (int i = 0; i < jardimAtual.nPlantas; i++)
         {
             char buffer[20];
@@ -156,12 +165,162 @@ jardim inicializaJardim(char *nomeFich)
         jardimAtual.nPlantas = 0;
     }
 
+    jardimAtual.lista = NULL;
+
     return jardimAtual;
+}
+
+pjardineiro inicializaJardineiros(char *nomeFicheiro)
+{
+    FILE *f;
+
+    f = fopen(nomeFicheiro, "rb");
+
+    if (f == NULL)
+    {
+        return NULL;
+    }
+
+    jardineiro jardineiroAuxiliar;
+    pjardineiro lista = NULL;
+
+    while (fread(&jardineiroAuxiliar, sizeof(jardineiro), 1, f) == 1)
+    {
+        pjardineiro novo;
+
+        novo = malloc(sizeof(jardineiro));
+
+        if (novo == NULL)
+        {
+            printf("ERRO: malloc()");
+
+            fclose(f);
+            return NULL;
+        }
+
+        (*novo) = jardineiroAuxiliar;
+
+        novo->prox = NULL;
+
+        if (lista == NULL)
+        {
+            lista = novo;
+        }
+        else
+        {
+            pjardineiro aux = lista;
+
+            while (aux->prox != NULL)
+            {
+                aux = aux->prox;
+            }
+
+            aux->prox = novo;
+        }
+    }
+
+    fclose(f);
+
+    return lista;
+}
+
+pjardineiro contrataJardineiro(pjardineiro lista)
+{
+    pjardineiro novo;
+
+    novo = malloc(sizeof(jardineiro));
+
+    if (novo == NULL)
+    {
+        printf("ERRO: malloc()\n");
+        return NULL;
+    }
+
+    printf("Nome: ");
+    scanf(" %[^\n]", novo->nome);
+
+    printf("Data de nascimento: ");
+    scanf(" %d/%d/%d", &novo->nascimento.dia, &novo->nascimento.mes, &novo->nascimento.ano);
+
+    printf("Hora de chegada: ");
+    scanf(" %d", &novo->horaChegada);
+
+    printf("Hora de saida: ");
+    scanf(" %d", &novo->horaSaida);
+
+    novo->prox = NULL;
+
+    if (lista == NULL)
+    {
+        lista = novo;
+    }
+    else
+    {
+        pjardineiro aux = lista;
+
+        while (aux->prox != NULL)
+        {
+            aux = aux->prox;
+        }
+
+        aux->prox = novo;
+    }
+
+    return lista;
+}
+
+pjardineiro despedeJardineiro(pjardineiro lista)
+{
+    char nome[100];
+    pjardineiro atual, anterior;
+
+    printf("Nome do jardineiro a despedir: ");
+    scanf(" %[^\n]", nome);
+
+    atual = lista;
+
+    while (atual != NULL)
+    {
+        if (strcmp(nome, atual->nome) == 0)
+        {
+            if (atual == lista)
+            {
+                lista = atual->prox;
+                free(atual);
+            }
+            else
+            {
+                anterior->prox = atual->prox;
+                free(atual);
+            }
+
+            return lista;
+        }
+        else
+        {
+            anterior = atual;
+            atual = atual->prox;
+        }
+    }
+
+    printf("Jardineiro %s nao existe\n", nome);
+
+    return lista;
+}
+
+void mostraJardineiros(pjardineiro lista)
+{
+    while (lista != NULL)
+    {
+        printf("%s %d/%d/%d [%d|%d]\n", lista->nome, lista->nascimento.dia, lista->nascimento.mes, lista->nascimento.ano, lista->horaChegada, lista->horaSaida);
+
+        lista = lista->prox;
+    }
 }
 
 void guardaDados(jardim jardimAtual)
 {
-    FILE* f;
+    FILE *f;
 
     f = fopen("jardim.txt", "wt");
 
@@ -174,22 +333,39 @@ void guardaDados(jardim jardimAtual)
 
         fprintf(f, "%s[%d, %.1f]\n", jardimAtual.plantas[i].especie, jardimAtual.plantas[i].idade, jardimAtual.plantas[i].temperaturaIdeal);
     }
-    
+
     fclose(f);
 }
 
-int main(int argc, char** args)
+int main(int argc, char **args)
 {
     int opcao;
-    char ficheiro[100];
+    char ficheiroJardins[100], ficheiroJardineiros[100];
     jardim jardimAtual;
 
-    if (argc == 2)
-        strcpy(ficheiro, args[1]);
-    else
-        strcpy(ficheiro, "jardim.txt");
-        
-    jardimAtual = inicializaJardim(ficheiro);
+    switch (argc)
+    {
+    case 3:
+        strcpy(ficheiroJardineiros, args[2]);
+        strcpy(ficheiroJardins, args[1]);
+
+        break;
+
+    case 2:
+        strcpy(ficheiroJardineiros, "jardineiros.bin");
+        strcpy(ficheiroJardins, args[1]);
+
+        break;
+
+    case 1:
+        strcpy(ficheiroJardineiros, "jardineiros.bin");
+        strcpy(ficheiroJardins, "jardim.txt");
+
+        break;
+    }
+
+    jardimAtual = inicializaJardim(ficheiroJardins);
+    jardimAtual.lista = inicializaJardineiros(ficheiroJardineiros);
 
     if (jardimAtual.plantas == NULL)
     {
@@ -204,6 +380,9 @@ int main(int argc, char** args)
         printf("1 - Adicionar planta\n");
         printf("2 - Remover planta\n");
         printf("3 - Ver plantas\n");
+        printf("4 - Contratar jardineiro\n");
+        printf("5 - Despedir jardineiro\n");
+        printf("6 - Ver jardineiros\n");
         printf("0 - Sair\n\n");
 
         printf("Opcao: ");
@@ -222,13 +401,25 @@ int main(int argc, char** args)
         case 3:
             mostraJardim(jardimAtual);
             break;
+
+        case 4:
+            jardimAtual.lista = contrataJardineiro(jardimAtual.lista);
+            break;
+
+        case 5:
+            jardimAtual.lista = despedeJardineiro(jardimAtual.lista);
+            break;
+
+        case 6:
+            mostraJardineiros(jardimAtual.lista);
+            break;
         }
 
         if (jardimAtual.plantas == NULL)
         {
             return 1;
         }
-        
+
     } while (opcao != 0);
 
     guardaDados(jardimAtual);
@@ -247,4 +438,23 @@ int main(int argc, char** args)
  * Parte 2:
  * Alterar a estrutura jardim para passar a ter um array dinamico
  * Alterar a funcao de adicionar uma planta para, em vez de adicionar a um array de tamanho fixo, cria uma nova posicao no array para cada planta
+ * Alterar a funcao de remocao para desta vez realocar o vetor dinamico
+ * 
+ * Parte 3:
+ * Receber dados de um ficheiro de texto e guardar no jardim
+ * No final do programa guardar os dados num ficheiro de texto
+ * 
+ * Parte 4:
+ * Criar uma nova estrutura de jardineiros que tem:
+ *  - Nome
+ *  - Data de nascimento
+ *  - Hora de entrada (inteiro)
+ *  - Hora de saida (inteiro)
+ * 
+ * Alterar a estrutura de jardim para que esta passe a poder ter uma lista ligada de jardineiros
+ * Adicionar 3 funcionalidades ao programa
+ *  - Contratar um jardineiro que sera adicionado ao final da lista
+ *  - Despedir um jardineiro por nome
+ *  - Mostrar todos os jardineiros da seguinte forma (NOME DATA_NASCIMENTO [HORA_ENTRADA|HORA_SAIDA])
+ * No final do programa libertar memoria de toda a lista
 */
